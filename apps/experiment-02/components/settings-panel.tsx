@@ -1,7 +1,7 @@
 "use client";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { RiQuillPenAiLine, RiSettingsLine } from "@remixicon/react";
+import { RiQuillPenAiLine, RiSettingsLine, RiCloseLine } from "@remixicon/react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,8 @@ import * as React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 type SettingsPanelContext = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
   openMobile: boolean;
   setOpenMobile: (open: boolean) => void;
   isMobile: boolean;
@@ -39,21 +41,28 @@ function useSettingsPanel() {
 
 const SettingsPanelProvider = ({ children }: { children: React.ReactNode }) => {
   const isMobile = useIsMobile(1024);
+  const [open, setOpen] = React.useState(false);
   const [openMobile, setOpenMobile] = React.useState(false);
 
   // Helper to toggle the sidebar.
   const togglePanel = React.useCallback(() => {
-    return isMobile && setOpenMobile((open) => !open);
-  }, [isMobile, setOpenMobile]);
+    if (isMobile) {
+      setOpenMobile((open) => !open);
+    } else {
+      setOpen((open) => !open);
+    }
+  }, [isMobile, setOpen, setOpenMobile]);
 
   const contextValue = React.useMemo<SettingsPanelContext>(
     () => ({
+      open,
+      setOpen,
       isMobile,
       openMobile,
       setOpenMobile,
       togglePanel,
     }),
-    [isMobile, openMobile, setOpenMobile, togglePanel],
+    [open, setOpen, isMobile, openMobile, setOpenMobile, togglePanel],
   );
 
   return (
@@ -84,7 +93,7 @@ const SettingsPanelContent = () => {
       {/* Sidebar content */}
       <div className="-mt-px">
         {/* Content group */}
-        <div className="py-5 relative before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-black/[0.06] before:via-black/10 before:to-black/[0.06]">
+        <div className="py-5 relative before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-border/20 before:via-border/40 before:to-border/20">
           <h3 className="text-xs font-medium uppercase text-muted-foreground/80 mb-4">
             Chat presets
           </h3>
@@ -191,7 +200,7 @@ const SettingsPanelContent = () => {
         </div>
 
         {/* Content group */}
-        <div className="py-5 relative before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-black/[0.06] before:via-black/10 before:to-black/[0.06]">
+        <div className="py-5 relative before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-border/20 before:via-border/40 before:to-border/20">
           <h3 className="text-xs font-medium uppercase text-muted-foreground/80 mb-4">
             Configurations
           </h3>
@@ -235,12 +244,12 @@ const SettingsPanelContent = () => {
 SettingsPanelContent.displayName = "SettingsPanelContent";
 
 const SettingsPanel = () => {
-  const { isMobile, openMobile, setOpenMobile } = useSettingsPanel();
+  const { isMobile, open, setOpen, openMobile, setOpenMobile } = useSettingsPanel();
 
   if (isMobile) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile}>
-        <SheetContent className="w-72 px-4 md:px-6 py-0 bg-[hsl(240_5%_92.16%)] [&>button]:hidden">
+        <SheetContent className="w-72 px-4 md:px-6 py-0 bg-background [&>button]:hidden">
           <SheetTitle className="hidden">Settings</SheetTitle>
           <div className="flex h-full w-full flex-col">
             <SettingsPanelContent />
@@ -250,12 +259,21 @@ const SettingsPanel = () => {
     );
   }
 
+  // Desktop slide-out panel
   return (
-    <ScrollArea>
-      <div className="w-[300px] px-4 md:px-6">
-        <SettingsPanelContent />
+    <div className={`fixed top-0 right-0 h-full w-80 bg-background border-l border-border transform transition-transform duration-300 ease-in-out z-50 ${open ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className="flex items-center justify-between p-4 border-b border-border">
+        <h2 className="text-lg font-semibold">Settings</h2>
+        <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>
+          <RiCloseLine className="h-4 w-4" />
+        </Button>
       </div>
-    </ScrollArea>
+      <ScrollArea className="h-[calc(100vh-5rem)]">
+        <div className="p-4">
+          <SettingsPanelContent />
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 SettingsPanel.displayName = "SettingsPanel";
@@ -265,11 +283,7 @@ const SettingsPanelTrigger = ({
 }: {
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 }) => {
-  const { isMobile, togglePanel } = useSettingsPanel();
-
-  if (!isMobile) {
-    return null;
-  }
+  const { togglePanel } = useSettingsPanel();
 
   return (
     <Button

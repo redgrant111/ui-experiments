@@ -1,7 +1,10 @@
+"use client";
+
 import * as React from "react";
 
 import { TeamSwitcher } from "@/components/team-switcher";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useSettingsPanel } from "@/components/settings-panel";
 import {
   Sidebar,
   SidebarContent,
@@ -104,6 +107,28 @@ const data = {
   ],
 };
 
+function SettingsMenuItem({ item }: { item: { title: string; icon: React.ComponentType<any> } }) {
+  const { togglePanel } = useSettingsPanel();
+  
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        className="group/menu-button font-medium gap-3 h-9 rounded-md [&>svg]:size-auto cursor-pointer"
+        onClick={togglePanel}
+      >
+        {item.icon && (
+          <item.icon
+            className="text-sidebar-foreground/50 group-data-[active=true]/menu-button:text-primary"
+            size={22}
+            aria-hidden="true"
+          />
+        )}
+        <span>{item.title}</span>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props} className="!border-none">
@@ -156,26 +181,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroupLabel>
           <SidebarGroupContent className="px-2">
             <SidebarMenu>
-              {data.navMain[1]?.items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    className="group/menu-button font-medium gap-3 h-9 rounded-md [&>svg]:size-auto"
-                    isActive={item.isActive}
-                  >
-                    <a href={item.url}>
-                      {item.icon && (
-                        <item.icon
-                          className="text-sidebar-foreground/50 group-data-[active=true]/menu-button:text-primary"
-                          size={22}
-                          aria-hidden="true"
-                        />
-                      )}
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {data.navMain[1]?.items.map((item) => {
+                if (item.title === "Settings") {
+                  return (
+                    <SettingsMenuItem key={item.title} item={item} />
+                  );
+                }
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      className="group/menu-button font-medium gap-3 h-9 rounded-md [&>svg]:size-auto"
+                      isActive={item.isActive}
+                    >
+                      <a href={item.url}>
+                        {item.icon && (
+                          <item.icon
+                            className="text-sidebar-foreground/50 group-data-[active=true]/menu-button:text-primary"
+                            size={22}
+                            aria-hidden="true"
+                          />
+                        )}
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
