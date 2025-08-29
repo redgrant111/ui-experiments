@@ -1,0 +1,10 @@
+2025-08-29T08:35:37: 
+2025-08-29T08:35:37: > experiment-02@0.0.1 dev /home/user/webapp/apps/experiment-02
+2025-08-29T08:35:37: > next dev --turbopack "--port" "3002"
+2025-08-29T08:35:37: 
+2025-08-29T08:35:38:    ▲ Next.js 15.2.4 (Turbopack)
+2025-08-29T08:35:38:    - Local:        http://localhost:3002
+2025-08-29T08:35:38:    - Network:      http://169.254.0.21:3002
+2025-08-29T08:35:38: 
+2025-08-29T08:35:38:  ✓ Starting...
+2025-08-29T08:35:40:  ✓ Ready in 1909ms

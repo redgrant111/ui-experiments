@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { TeamSwitcher } from "@/components/team-switcher";
+import { ThemeToggle } from "@/components/theme-toggle";
 import {
   Sidebar,
   SidebarContent,
@@ -105,7 +106,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar {...props} className="dark !border-none">
+    <Sidebar {...props} className="!border-none">
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
@@ -142,6 +143,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        {/* Theme Toggle */}
+        <SidebarGroup>
+          <SidebarGroupContent className="px-2">
+            <ThemeToggle />
+          </SidebarGroupContent>
+        </SidebarGroup>
         {/* Secondary Navigation */}
         <SidebarGroup>
           <SidebarGroupLabel className="uppercase text-sidebar-foreground/50">
